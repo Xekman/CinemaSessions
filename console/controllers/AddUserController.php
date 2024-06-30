@@ -15,6 +15,7 @@ class AddUserController extends Controller
         $user->email = $email;
         $user->setPassword($password);
         $user->generateAuthKey();
+        $user->status = User::STATUS_ACTIVE;
         if ($user->save()) {
             echo "User $username has been created.\n";
         } else {
@@ -25,4 +26,3 @@ class AddUserController extends Controller
         }
     }
 }
-
