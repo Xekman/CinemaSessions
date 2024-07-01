@@ -1,81 +1,122 @@
 <?php
 
-/** @var \yii\web\View $this */
-/** @var string $content */
-
-use backend\assets\AppAsset;
-use common\widgets\Alert;
-use yii\bootstrap5\Breadcrumbs;
-use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
-use yii\bootstrap5\NavBar;
+use yii\helpers\Html;
+use yii\widgets\Breadcrumbs;
 
-AppAsset::register($this);
+$this->beginPage();
 ?>
-<?php $this->beginPage() ?>
 <!DOCTYPE html>
-<html lang="<?= Yii::$app->language ?>" class="h-100">
+<html lang="<?= Yii::$app->language ?>">
 <head>
     <meta charset="<?= Yii::$app->charset ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <?php $this->registerCsrfMetaTags() ?>
+    <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <style>
+        body {
+            background-color: #343a40;
+            color: #ffffff;
+        }
+        .wrapper {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #212529;
+            padding: 20px;
+            border-right: 1px solid #495057;
+        }
+        .content {
+            flex: 1;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background-color: #495057;
+            padding: 10px 20px;
+            border-bottom: 1px solid #6c757d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: calc(100% - 250px);
+        }
+        .navbar-light .navbar-brand, .navbar-light .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .navbar-light .navbar-nav .nav-link:hover {
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .btn-link.logout {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .btn-link.logout:hover {
+            color: rgba(255, 255, 255, 0.75);
+        }
+        a {
+            color: #17a2b8;
+        }
+        a:hover {
+            color: #138496;
+        }
+        .nav.flex-column .nav-link {
+            color: #ffffff;
+        }
+        .nav.flex-column .nav-link:hover {
+            background-color: #495057;
+        }
+        .main-content {
+            flex: 1;
+            background-color: #ffffff;
+            color: #000000;
+            padding: 20px;
+            overflow: auto;
+        }
+    </style>
 </head>
-<body class="d-flex flex-column h-100">
+<body>
 <?php $this->beginBody() ?>
 
-<header>
-    <?php
-    NavBar::begin([
-        'brandLabel' => Yii::$app->name,
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => [
-            'class' => 'navbar navbar-expand-md navbar-dark bg-dark fixed-top',
-        ],
-    ]);
-    $menuItems = [
-        ['label' => 'Home', 'url' => ['/site/index']],
-    ];
-    if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
-    }     
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav me-auto mb-2 mb-md-0'],
-        'items' => $menuItems,
-    ]);
-    if (Yii::$app->user->isGuest) {
-        echo Html::tag('div',Html::a('Login',['/site/login'],['class' => ['btn btn-link login text-decoration-none']]),['class' => ['d-flex']]);
-    } else {
-        echo Html::beginForm(['/site/logout'], 'post', ['class' => 'd-flex'])
-            . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
-                ['class' => 'btn btn-link logout text-decoration-none']
-            )
-            . Html::endForm();
-    }
-    NavBar::end();
-    ?>
-</header>
-
-<main role="main" class="flex-shrink-0">
-    <div class="container">
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
-        <?= Alert::widget() ?>
-        <?= $content ?>
+<div class="wrapper">
+    <div class="sidebar">
+        <h2><?= Yii::$app->name ?></h2>
+        <?php
+        echo Nav::widget([
+            'options' => ['class' => 'nav flex-column'],
+            'items' => [
+                ['label' => 'Фильмы', 'url' => ['/film/index']],
+                ['label' => 'Сессии', 'url' => ['/session/index']]
+            ],
+        ]);
+        ?>
     </div>
-</main>
-
-<footer class="footer mt-auto py-3 text-muted">
-    <div class="container">
-        <p class="float-start">&copy; <?= Html::encode(Yii::$app->name) ?> <?= date('Y') ?></p>
-        <p class="float-end"><?= Yii::powered() ?></p>
+    <div class="content">
+        <div class="header">
+            <a class="navbar-brand" href="<?= Yii::$app->homeUrl ?>">Административная панель</a>
+            <div class="navbar-nav">
+                <?= Html::beginForm(['/site/logout'], 'post')
+                . Html::submitButton(
+                    'Logout (' . Yii::$app->user->identity->username . ')',
+                    ['class' => 'btn btn-link logout']
+                )
+                . Html::endForm() ?>
+            </div>
+        </div>
+        <div class="main-content">
+            <?= Breadcrumbs::widget([
+                'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+                'itemTemplate' => "<li>{link} / </li>\n",
+                'activeItemTemplate' => "<li>{link}</li>\n",
+            ]) ?>
+            <?= $content ?>
+        </div>
     </div>
-</footer>
+</div>
 
 <?php $this->endBody() ?>
 </body>
 </html>
-<?php $this->endPage();
+<?php $this->endPage() ?>
