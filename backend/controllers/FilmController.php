@@ -1,12 +1,14 @@
 <?php
 
 namespace backend\controllers;
-
+use Yii;
+use yii\data\ActiveDataProvider;
 use backend\models\Film;
 use backend\models\FilmSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * FilmController implements the CRUD actions for Film model.
@@ -39,7 +41,9 @@ class FilmController extends Controller
     public function actionIndex()
     {
         $searchModel = new FilmSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
+        $dataProvider = new ActiveDataProvider([
+            'query' => Film::find(),
+        ]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -69,12 +73,11 @@ class FilmController extends Controller
     {
         $model = new Film();
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            $model->photoFile = UploadedFile::getInstance($model, 'photoFile');
+            if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }
-        } else {
-            $model->loadDefaultValues();
         }
 
         return $this->render('create', [
@@ -93,8 +96,11 @@ class FilmController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->photoFile = UploadedFile::getInstance($model, 'photoFile');
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [

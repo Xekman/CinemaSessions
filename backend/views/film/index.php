@@ -34,7 +34,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'description:ntext',
             'duration',
             'age_limit',
-            //'photo_extension',
+            [
+                'attribute' => 'photo_extension',
+                'label' => 'Фото (формат)',
+                'value' => function ($model) {
+                    return $model->photo_extension ? $model->photo_extension : 'No photo';
+                },
+            ],
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Film $model, $key, $index, $column) {

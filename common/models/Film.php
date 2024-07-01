@@ -22,6 +22,7 @@ class Film extends ActiveRecord
     /**
      * {@inheritdoc}
      */
+    public $photoFile;
     public static function tableName()
     {
         return 'film';
@@ -33,11 +34,11 @@ class Film extends ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'description', 'duration', 'age_limit', 'photo_extension'], 'required'],
+            [['title', 'description', 'duration', 'age_limit'], 'required'],
+            [['title'], 'string', 'max' => 255],
             [['description'], 'string'],
-            [['duration'], 'integer'],
-            [['created_at', 'updated_at'], 'safe'],
-            [['title', 'age_limit', 'photo_extension'], 'string', 'max' => 255],
+            [['duration', 'age_limit'], 'integer'],
+            [['photoFile'], 'file', 'extensions' => 'png, jpg, jpeg'],
         ];
     }
 
@@ -55,6 +56,58 @@ class Film extends ActiveRecord
             'photo_extension' => 'Расширение фото',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата обновления',
+            'photoFile' => 'Фото',
         ];
+    }
+
+    /**
+     * получение id модели и расширения фото
+     * @return string
+     */
+    public function getPhotoUrl()
+    {
+        return Yii::getAlias('@web') . '/upload/film/' . $this->id . '.' . $this->photo_extension;
+    }
+
+
+
+    /**
+     * загрузка фото
+     * @return bool
+     */
+    public function uploadPhoto()
+    {
+        if ($this->validate()) {
+            $uploadPath = Yii::getAlias('@frontend/web/upload/film/');
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
+            $photoPath = $uploadPath . $this->id . '.' . $this->photoFile->extension;
+            if ($this->photoFile->saveAs($photoPath)) {
+                $this->photo_extension = $this->photoFile->extension;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if (empty($this->photo_extension)) {
+                $this->photo_extension = '';
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        if ($this->photoFile) {
+            $this->uploadPhoto();
+            $this->updateAttributes(['photo_extension' => $this->photoFile->extension]);
+        }
     }
 }
