@@ -7,6 +7,7 @@ use backend\models\SessionSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\data\ActiveDataProvider;
 
 /**
  * SessionController implements the CRUD actions for Session model.
@@ -39,7 +40,12 @@ class SessionController extends Controller
     public function actionIndex()
     {
         $searchModel = new SessionSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
+        $dataProvider = new ActiveDataProvider([
+            'query' => Session::find()->orderBy(['date' => SORT_ASC, 'time' => SORT_ASC]),
+            'pagination' => [
+                'pageSize' => 20,
+            ],
+        ]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
