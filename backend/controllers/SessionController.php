@@ -1,7 +1,7 @@
 <?php
 
 namespace backend\controllers;
-
+use Yii;
 use backend\models\Session;
 use backend\models\SessionSearch;
 use yii\web\Controller;
@@ -69,19 +69,16 @@ class SessionController extends Controller
     {
         $model = new Session();
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->validate() && $model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }
-        } else {
-            $model->loadDefaultValues();
         }
 
         return $this->render('create', [
             'model' => $model,
         ]);
     }
-
     /**
      * Updates an existing Session model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -93,14 +90,17 @@ class SessionController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->validate() && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [
             'model' => $model,
         ]);
     }
+
 
     /**
      * Deletes an existing Session model.
