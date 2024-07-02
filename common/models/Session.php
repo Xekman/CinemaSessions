@@ -77,7 +77,12 @@ class Session extends ActiveRecord
         }
     }
 
-
-
+    public function getPhotoUrl()
+    {
+        if ($this->film && $this->film->photo_extension) {
+            return Yii::getAlias('@web') . '/upload/film/' . $this->film->id . '.' . $this->film->photo_extension;
+        }
+        return null;
+    }
 
 }
