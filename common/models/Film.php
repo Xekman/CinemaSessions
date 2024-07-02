@@ -37,7 +37,8 @@ class Film extends ActiveRecord
             [['title', 'description', 'duration', 'age_limit'], 'required'],
             [['title'], 'string', 'max' => 255],
             [['description'], 'string'],
-            [['duration', 'age_limit'], 'integer'],
+            [['age_limit'], 'integer'],
+            [['duration'], 'number'],
             [['photoFile'], 'file', 'extensions' => 'png, jpg, jpeg'],
         ];
     }
